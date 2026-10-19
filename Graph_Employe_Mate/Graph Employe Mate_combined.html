@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>그래프 아카이브 · 업무 엔진</title>
+<style>
+  html, body { height: 100%; margin: 0; }
+  body { display: flex; flex-direction: column; background: #f5f7fb; font-family: -apple-system, "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; }
+  .topbar { display: flex; gap: 8px; padding: 10px 14px 0; background: #fff; border-bottom: 1px solid #e3e7ef; flex: 0 0 auto; }
+  .toptab { border: 0; background: none; padding: 10px 18px; font-size: 15px; font-weight: 700; color: #6b7487; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -1px; }
+  .toptab:hover { color: #2b3550; }
+  .toptab.on { color: #1f4fcc; border-bottom-color: #1f4fcc; }
+  .panes { flex: 1 1 auto; position: relative; min-height: 0; }
+  .pane { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: none; background: #f5f7fb; }
+  .pane.on { display: block; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <button class="toptab on" data-t="graph">📈 그래프 아카이브</button>
+  <button class="toptab" data-t="work">⚙️ 업무 엔진</button>
+</div>
+<div class="panes">
+  <iframe class="pane on" id="p-graph" title="그래프 아카이브" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;ko&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, viewport-fit=cover&quot;&gt;
+&lt;title&gt;그래프 아카이브&lt;/title&gt;
+&lt;style&gt;
+  :root {
+    color-scheme: light;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    --bg: #f6f8fb;
+    --text: #1d2733;
+    --muted: #6b7785;
+    --card: #ffffff;
+    --blue1: #2f6bff; --blue2: #7fd0ff;
+    --lime: #9be02c;
+    --green: #1f9d55; --yellow: #fff3a3;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, &quot;Apple SD Gothic Neo&quot;, &quot;Noto Sans KR&quot;, &quot;Malgun Gothic&quot;, sans-serif;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .stat { background: var(--card); border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .stat b { display: block; font-size: 26px; line-height: 1.1; }
+  .stat span { font-size: 12px; color: var(--muted); }
+  .stat.mine b { color: var(--green); }
+
+  .goal { background: var(--card); border-radius: 12px; padding: 12px 14px; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .goal label { font-size: 13px; color: var(--muted); }
+  .goal input[type=number] { width: 60px; padding: 3px 6px; border: 1px solid #d5dce5; border-radius: 6px; font-size: 14px; }
+  .bar { height: 10px; background: #e8edf3; border-radius: 6px; overflow: hidden; margin-top: 8px; }
+  .bar &gt; i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--lime), var(--green)); transition: width .4s; }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; }
+  .tab { border: 1px solid #d5dce5; background: #fff; padding: 6px 12px; border-radius: 999px; font-size: 13px; cursor: pointer; }
+  .tab.on { background: var(--text); color: #fff; border-color: var(--text); }
+  .spacer { flex: 1; }
+  button.act { border: 0; background: var(--blue1); color: #fff; padding: 8px 14px; border-radius: 10px; font-size: 14px; cursor: pointer; }
+  button.ghost { border: 1px solid #d5dce5; background: #fff; color: var(--text); padding: 7px 12px; border-radius: 10px; font-size: 13px; cursor: pointer; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  /* gradient / solid border via padding wrapper */
+  .frame { padding: 4px; border-radius: 16px; }
+  .frame.interest { background: linear-gradient(135deg, var(--blue1), var(--blue2)); }
+  .frame.sim { background: var(--lime); }
+  .frame.exp { background: linear-gradient(135deg, var(--green), var(--yellow)); }
+  .card { background: var(--card); border-radius: 12px; overflow: hidden; height: 100%; display: flex; flex-direction: column; }
+  .thumb { aspect-ratio: 4 / 3; background: #f0f3f7; display: flex; align-items: center; justify-content: center; cursor: zoom-in; }
+  .thumb img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+  .thumb.empty { color: var(--muted); font-size: 13px; cursor: default; }
+  .info { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .badge { align-self: flex-start; font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 600; }
+  .badge.interest { background: #e3edff; color: #1f4fcc; }
+  .badge.sim { background: #eaf9c9; color: #4d7a00; }
+  .badge.exp { background: #e2f5e9; color: #17743f; }
+  .title { font-weight: 600; font-size: 15px; word-break: break-word; }
+  .memo { font-size: 13px; color: var(--muted); white-space: pre-wrap; word-break: break-word; }
+  .meta { font-size: 12px; color: var(--muted); margin-top: auto; padding-top: 6px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .meta a { color: var(--blue1); }
+  .del { border: 0; background: none; color: #b33; cursor: pointer; font-size: 12px; }
+  .edit { border: 0; background: none; color: var(--blue1); cursor: pointer; font-size: 12px; }
+  .title[data-tid] { cursor: text; }
+  .titleinput { width: 100%; font: inherit; font-weight: 600; font-size: 15px; padding: 3px 6px; border: 2px solid var(--blue1); border-radius: 6px; color: var(--text); background: #fff; }
+  .emptymsg { text-align: center; color: var(--muted); padding: 50px 10px; grid-column: 1 / -1; }
+  .notice { background: #fffbe0; border: 1px solid #f0e6a0; border-radius: 12px; padding: 10px 14px; margin-bottom: 18px; font-size: 13px; }
+  select.badge { border: 0; cursor: pointer; font-family: inherit; }
+
+  dialog { border: 0; border-radius: 16px; padding: 0; width: min(440px, 92vw); max-height: 90vh; }
+  dialog::backdrop { background: rgba(20,30,45,.45); }
+  .form { padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+  .form h2 { margin: 0 0 4px; font-size: 18px; }
+  .form label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 3px; }
+  .form input[type=text], .form input[type=url], .form textarea, .form input[type=file] {
+    width: 100%; padding: 8px 10px; border: 1px solid #d5dce5; border-radius: 8px; font: inherit; font-size: 14px; background: #fff; color: var(--text);
+  }
+  .form textarea { min-height: 70px; resize: vertical; }
+  .types { display: flex; gap: 6px; }
+  .types label { flex: 1; margin: 0; }
+  .types input { display: none; }
+  .types span { display: block; text-align: center; padding: 8px 4px; border-radius: 10px; border: 2px solid #d5dce5; font-size: 13px; cursor: pointer; color: var(--text); }
+  .types input:checked + span.interest { border-color: var(--blue1); background: #e3edff; }
+  .types input:checked + span.sim { border-color: var(--lime); background: #eaf9c9; }
+  .types input:checked + span.exp { border-color: var(--green); background: #fffbe0; }
+  .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 6px; }
+
+  #viewer img { max-width: 100%; max-height: 80vh; display: block; margin: 0 auto; }
+  #viewer { width: min(900px, 94vw); padding: 12px; }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;h1&gt;📈 그래프 아카이브&lt;/h1&gt;
+  &lt;p class=&quot;sub&quot;&gt;논문의 핵심은 그래프. 하나씩 쌓이는 게 보이면 쓸 힘이 생겨요.&lt;/p&gt;
+
+  &lt;div class=&quot;stats&quot;&gt;
+    &lt;div class=&quot;stat&quot;&gt;&lt;b id=&quot;sAll&quot;&gt;0&lt;/b&gt;&lt;span&gt;전체&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;stat&quot;&gt;&lt;b id=&quot;sInt&quot; style=&quot;color:var(--blue1)&quot;&gt;0&lt;/b&gt;&lt;span&gt;관심 그래프&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;stat mine&quot;&gt;&lt;b id=&quot;sSim&quot; style=&quot;color:#6aa800&quot;&gt;0&lt;/b&gt;&lt;span&gt;내 시뮬레이션&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;stat mine&quot;&gt;&lt;b id=&quot;sExp&quot;&gt;0&lt;/b&gt;&lt;span&gt;내 실험&lt;/span&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;goal&quot;&gt;
+    &lt;label&gt;내 그래프 목표 &lt;input type=&quot;number&quot; id=&quot;goalN&quot; min=&quot;1&quot; value=&quot;10&quot;&gt; 개 · 현재 &lt;b id=&quot;goalCur&quot;&gt;0&lt;/b&gt;개&lt;/label&gt;
+    &lt;div class=&quot;bar&quot;&gt;&lt;i id=&quot;goalBar&quot;&gt;&lt;/i&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;notice&quot;&gt;📁 CSV파일은 하나의 저장소에 저장하길 권장합니다.&lt;/div&gt;
+
+  &lt;div class=&quot;toolbar&quot;&gt;
+    &lt;button class=&quot;tab on&quot; data-f=&quot;all&quot;&gt;전체&lt;/button&gt;
+    &lt;button class=&quot;tab&quot; data-f=&quot;interest&quot;&gt;🔵 관심&lt;/button&gt;
+    &lt;button class=&quot;tab&quot; data-f=&quot;sim&quot;&gt;🟢 시뮬&lt;/button&gt;
+    &lt;button class=&quot;tab&quot; data-f=&quot;exp&quot;&gt;🌿 실험&lt;/button&gt;
+    &lt;div class=&quot;spacer&quot;&gt;&lt;/div&gt;
+    &lt;button class=&quot;ghost&quot; id=&quot;btnExport&quot;&gt;내보내기&lt;/button&gt;
+    &lt;button class=&quot;ghost&quot; id=&quot;btnImport&quot;&gt;가져오기&lt;/button&gt;
+    &lt;button class=&quot;act&quot; id=&quot;btnAdd&quot;&gt;+ 그래프 추가&lt;/button&gt;
+    &lt;input type=&quot;file&quot; id=&quot;importFile&quot; accept=&quot;application/json&quot; hidden&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;grid&quot; id=&quot;grid&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;dialog id=&quot;dlg&quot;&gt;
+  &lt;div class=&quot;form&quot;&gt;
+    &lt;h2&gt;그래프 추가&lt;/h2&gt;
+    &lt;div&gt;
+      &lt;label&gt;분류&lt;/label&gt;
+      &lt;div class=&quot;types&quot;&gt;
+        &lt;label&gt;&lt;input type=&quot;radio&quot; name=&quot;type&quot; value=&quot;interest&quot; checked&gt;&lt;span class=&quot;interest&quot;&gt;🔵 관심&lt;/span&gt;&lt;/label&gt;
+        &lt;label&gt;&lt;input type=&quot;radio&quot; name=&quot;type&quot; value=&quot;sim&quot;&gt;&lt;span class=&quot;sim&quot;&gt;🟢 내 시뮬&lt;/span&gt;&lt;/label&gt;
+        &lt;label&gt;&lt;input type=&quot;radio&quot; name=&quot;type&quot; value=&quot;exp&quot;&gt;&lt;span class=&quot;exp&quot;&gt;🌿 내 실험&lt;/span&gt;&lt;/label&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div&gt;&lt;label&gt;제목&lt;/label&gt;&lt;input type=&quot;text&quot; id=&quot;fTitle&quot; placeholder=&quot;예: ARF 벽두께에 따른 transmission&quot;&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;label&gt;이미지 파일&lt;/label&gt;&lt;input type=&quot;file&quot; id=&quot;fFile&quot; accept=&quot;image/*&quot;&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;label&gt;또는 이미지 URL (GitHub raw 등)&lt;/label&gt;&lt;input type=&quot;url&quot; id=&quot;fUrl&quot; placeholder=&quot;https://...&quot;&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;label&gt;메모 (무엇을 보여주는 그래프인지 / 논문 어느 Figure 후보인지)&lt;/label&gt;&lt;textarea id=&quot;fMemo&quot;&gt;&lt;/textarea&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;label&gt;출처 링크 (관심 그래프는 논문 링크 등, 선택)&lt;/label&gt;&lt;input type=&quot;url&quot; id=&quot;fSrc&quot; placeholder=&quot;https://...&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;row&quot;&gt;
+      &lt;button class=&quot;ghost&quot; id=&quot;fCancel&quot;&gt;취소&lt;/button&gt;
+      &lt;button class=&quot;act&quot; id=&quot;fSave&quot;&gt;저장&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/dialog&gt;
+
+&lt;dialog id=&quot;viewer&quot;&gt;&lt;img id=&quot;viewImg&quot; alt=&quot;&quot;&gt;&lt;div class=&quot;row&quot;&gt;&lt;button class=&quot;ghost&quot; id=&quot;viewClose&quot;&gt;닫기&lt;/button&gt;&lt;/div&gt;&lt;/dialog&gt;
+
+&lt;script&gt;
+(function () {
+  var KEY = &#x27;graph-archive-v1&#x27;;
+  var LABEL = { interest: &#x27;관심&#x27;, sim: &#x27;내 시뮬&#x27;, exp: &#x27;내 실험&#x27; };
+  var items = [], filter = &#x27;all&#x27;, goal = 10;
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) { var d = JSON.parse(raw); items = d.items || []; goal = d.goal || 10; }
+    } catch (e) { items = []; }
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify({ items: items, goal: goal })); }
+    catch (e) { alert(&#x27;저장 공간이 부족해요. 내보내기로 백업하거나 이미지 대신 URL을 써 보세요.&#x27;); }
+  }
+  function esc(s) { return String(s || &#x27;&#x27;).replace(/[&amp;&lt;&gt;&quot;&#x27;]/g, function (c) { return { &#x27;&amp;&#x27;: &#x27;&amp;amp;&#x27;, &#x27;&lt;&#x27;: &#x27;&amp;lt;&#x27;, &#x27;&gt;&#x27;: &#x27;&amp;gt;&#x27;, &#x27;&quot;&#x27;: &#x27;&amp;quot;&#x27;, &quot;&#x27;&quot;: &#x27;&amp;#39;&#x27; }[c]; }); }
+  function safeUrl(u) { return /^https?:\/\//i.test(u || &#x27;&#x27;) ? u : &#x27;&#x27;; }
+  function safeImg(u) { return /^(https?:\/\/|data:image\/)/i.test(u || &#x27;&#x27;) ? u : &#x27;&#x27;; }
+
+  function render() {
+    var n = { interest: 0, sim: 0, exp: 0 };
+    items.forEach(function (i) { n[i.type]++; });
+    document.getElementById(&#x27;sAll&#x27;).textContent = items.length;
+    document.getElementById(&#x27;sInt&#x27;).textContent = n.interest;
+    document.getElementById(&#x27;sSim&#x27;).textContent = n.sim;
+    document.getElementById(&#x27;sExp&#x27;).textContent = n.exp;
+    var mine = n.sim + n.exp;
+    document.getElementById(&#x27;goalCur&#x27;).textContent = mine;
+    document.getElementById(&#x27;goalN&#x27;).value = goal;
+    document.getElementById(&#x27;goalBar&#x27;).style.width = Math.min(100, mine / goal * 100) + &#x27;%&#x27;;
+
+    var list = items.filter(function (i) { return filter === &#x27;all&#x27; || i.type === filter; });
+    var g = document.getElementById(&#x27;grid&#x27;);
+    if (!list.length) { g.innerHTML = &#x27;&lt;div class=&quot;emptymsg&quot;&gt;아직 없어요. 첫 그래프를 추가해 보세요.&lt;/div&gt;&#x27;; return; }
+    g.innerHTML = list.map(function (i) {
+      var img = safeImg(i.img), src = safeUrl(i.src);
+      return &#x27;&lt;div class=&quot;frame &#x27; + i.type + &#x27;&quot;&gt;&lt;div class=&quot;card&quot;&gt;&#x27; +
+        (img ? &#x27;&lt;div class=&quot;thumb&quot; data-view=&quot;&#x27; + i.id + &#x27;&quot;&gt;&lt;img src=&quot;&#x27; + esc(img) + &#x27;&quot; alt=&quot;&quot;&gt;&lt;/div&gt;&#x27; : &#x27;&lt;div class=&quot;thumb empty&quot;&gt;이미지 없음&lt;/div&gt;&#x27;) +
+        &#x27;&lt;div class=&quot;info&quot;&gt;&lt;select class=&quot;badge &#x27; + i.type + &#x27;&quot; data-type=&quot;&#x27; + i.id + &#x27;&quot; title=&quot;분류 변경&quot;&gt;&#x27; + [&#x27;interest&#x27;, &#x27;sim&#x27;, &#x27;exp&#x27;].map(function (t) { return &#x27;&lt;option value=&quot;&#x27; + t + &#x27;&quot;&#x27; + (t === i.type ? &#x27; selected&#x27; : &#x27;&#x27;) + &#x27;&gt;&#x27; + LABEL[t] + &#x27;&lt;/option&gt;&#x27;; }).join(&#x27;&#x27;) + &#x27;&lt;/select&gt;&#x27; +
+        &#x27;&lt;div class=&quot;title&quot; data-tid=&quot;&#x27; + i.id + &#x27;&quot; title=&quot;클릭해서 제목 수정&quot;&gt;&#x27; + esc(i.title || &#x27;(제목 없음)&#x27;) + &#x27;&lt;/div&gt;&#x27; +
+        (i.memo ? &#x27;&lt;div class=&quot;memo&quot;&gt;&#x27; + esc(i.memo) + &#x27;&lt;/div&gt;&#x27; : &#x27;&#x27;) +
+        &#x27;&lt;div class=&quot;meta&quot;&gt;&lt;span&gt;&#x27; + esc(i.date) + (src ? &#x27; · &lt;a href=&quot;&#x27; + esc(src) + &#x27;&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;출처&lt;/a&gt;&#x27; : &#x27;&#x27;) + &#x27;&lt;/span&gt;&#x27; +
+        &#x27;&lt;span&gt;&lt;button class=&quot;edit&quot; data-edit=&quot;&#x27; + i.id + &#x27;&quot;&gt;제목 수정&lt;/button&gt;&lt;button class=&quot;del&quot; data-del=&quot;&#x27; + i.id + &#x27;&quot;&gt;삭제&lt;/button&gt;&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&#x27;;
+    }).join(&#x27;&#x27;);
+  }
+
+  function resize(file, cb) {
+    var r = new FileReader();
+    r.onload = function () {
+      var im = new Image();
+      im.onload = function () {
+        var max = 900, s = Math.min(1, max / Math.max(im.width, im.height));
+        var c = document.createElement(&#x27;canvas&#x27;);
+        c.width = Math.round(im.width * s); c.height = Math.round(im.height * s);
+        var x = c.getContext(&#x27;2d&#x27;); x.fillStyle = &#x27;#fff&#x27;; x.fillRect(0, 0, c.width, c.height);
+        x.drawImage(im, 0, 0, c.width, c.height);
+        cb(c.toDataURL(&#x27;image/jpeg&#x27;, 0.85));
+      };
+      im.onerror = function () { cb(&#x27;&#x27;); };
+      im.src = r.result;
+    };
+    r.readAsDataURL(file);
+  }
+
+  var dlg = document.getElementById(&#x27;dlg&#x27;);
+  document.getElementById(&#x27;btnAdd&#x27;).onclick = function () {
+    [&#x27;fTitle&#x27;, &#x27;fUrl&#x27;, &#x27;fMemo&#x27;, &#x27;fSrc&#x27;].forEach(function (id) { document.getElementById(id).value = &#x27;&#x27;; });
+    document.getElementById(&#x27;fFile&#x27;).value = &#x27;&#x27;;
+    dlg.showModal();
+  };
+  document.getElementById(&#x27;fCancel&#x27;).onclick = function () { dlg.close(); };
+  document.getElementById(&#x27;fSave&#x27;).onclick = function () {
+    var type = document.querySelector(&#x27;input[name=type]:checked&#x27;).value;
+    var base = {
+      id: Date.now() + &#x27;&#x27; + Math.floor(Math.random() * 1000), type: type,
+      title: document.getElementById(&#x27;fTitle&#x27;).value.trim(),
+      memo: document.getElementById(&#x27;fMemo&#x27;).value.trim(),
+      src: document.getElementById(&#x27;fSrc&#x27;).value.trim(),
+      date: new Date().toISOString().slice(0, 10), img: &#x27;&#x27;
+    };
+    var f = document.getElementById(&#x27;fFile&#x27;).files[0];
+    var url = document.getElementById(&#x27;fUrl&#x27;).value.trim();
+    function done(img) { base.img = img; items.unshift(base); save(); render(); dlg.close(); }
+    if (f) resize(f, done); else done(url);
+  };
+
+  function startEdit(id) {
+    var el = document.querySelector(&#x27;[data-tid=&quot;&#x27; + id + &#x27;&quot;]&#x27;);
+    var it = items.filter(function (i) { return i.id === id; })[0];
+    if (!el || !it) return;
+    var inp = document.createElement(&#x27;input&#x27;);
+    inp.type = &#x27;text&#x27;; inp.className = &#x27;titleinput&#x27;; inp.value = it.title || &#x27;&#x27;;
+    el.replaceWith(inp); inp.focus(); inp.select();
+    var finished = false;
+    function finish(ok) {
+      if (finished) return; finished = true;
+      if (ok) { it.title = inp.value.trim(); save(); }
+      render();
+    }
+    inp.addEventListener(&#x27;keydown&#x27;, function (ev) {
+      if (ev.key === &#x27;Enter&#x27;) finish(true);
+      else if (ev.key === &#x27;Escape&#x27;) finish(false);
+    });
+    inp.addEventListener(&#x27;blur&#x27;, function () { finish(true); });
+  }
+
+  document.getElementById(&#x27;grid&#x27;).addEventListener(&#x27;click&#x27;, function (e) {
+    var ed = e.target.closest(&#x27;[data-edit],[data-tid]&#x27;);
+    if (ed) { startEdit(ed.dataset.edit || ed.dataset.tid); return; }
+    var d = e.target.closest(&#x27;[data-del]&#x27;);
+    if (d) {
+      if (confirm(&#x27;이 그래프를 삭제할까요?&#x27;)) { items = items.filter(function (i) { return i.id !== d.dataset.del; }); save(); render(); }
+      return;
+    }
+    var v = e.target.closest(&#x27;[data-view]&#x27;);
+    if (v) {
+      var it = items.filter(function (i) { return i.id === v.dataset.view; })[0];
+      if (it) { document.getElementById(&#x27;viewImg&#x27;).src = safeImg(it.img); document.getElementById(&#x27;viewer&#x27;).showModal(); }
+    }
+  });
+  document.getElementById(&#x27;viewClose&#x27;).onclick = function () { document.getElementById(&#x27;viewer&#x27;).close(); };
+
+  document.querySelectorAll(&#x27;.tab&#x27;).forEach(function (t) {
+    t.onclick = function () {
+      document.querySelectorAll(&#x27;.tab&#x27;).forEach(function (x) { x.classList.remove(&#x27;on&#x27;); });
+      t.classList.add(&#x27;on&#x27;); filter = t.dataset.f; render();
+    };
+  });
+  document.getElementById(&#x27;goalN&#x27;).onchange = function (e) { goal = Math.max(1, parseInt(e.target.value, 10) || 10); save(); render(); };
+
+  document.getElementById(&#x27;grid&#x27;).addEventListener(&#x27;change&#x27;, function (e) {
+    var s = e.target.closest(&#x27;[data-type]&#x27;);
+    if (!s) return;
+    var it = items.filter(function (i) { return i.id === s.dataset.type; })[0];
+    if (it &amp;&amp; LABEL[s.value]) { it.type = s.value; save(); render(); }
+  });
+
+  document.getElementById(&#x27;btnExport&#x27;).onclick = function () {
+    var blob = new Blob([JSON.stringify({ items: items, goal: goal })], { type: &#x27;application/json&#x27; });
+    var a = document.createElement(&#x27;a&#x27;); a.href = URL.createObjectURL(blob); a.download = &#x27;graph-archive.json&#x27;; a.click();
+  };
+  document.getElementById(&#x27;btnImport&#x27;).onclick = function () { document.getElementById(&#x27;importFile&#x27;).click(); };
+  document.getElementById(&#x27;importFile&#x27;).onchange = function (e) {
+    var f = e.target.files[0]; if (!f) return;
+    var r = new FileReader();
+    r.onload = function () {
+      try { var d = JSON.parse(r.result); items = d.items || []; goal = d.goal || 10; save(); render(); }
+      catch (err) { alert(&#x27;파일을 읽을 수 없어요.&#x27;); }
+    };
+    r.readAsText(f);
+  };
+
+  load(); render();
+})();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe>
+  <iframe class="pane" id="p-work" title="업무 엔진" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;ko&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, viewport-fit=cover&quot;&gt;
+&lt;title&gt;업무 엔진&lt;/title&gt;
+&lt;style&gt;
+  :root {
+    color-scheme: light;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    --bg: #f6f8fb;
+    --text: #1d2733;
+    --muted: #6b7785;
+    --card: #ffffff;
+    --blue1: #2f6bff; --blue2: #7fd0ff;
+    --lime: #9be02c;
+    --green: #1f9d55; --yellow: #fff3a3;
+    --orange: #f08a24; --orange2: #ffd27a;
+    --violet: #8a5cf6; --violet2: #d6c2ff;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, &quot;Apple SD Gothic Neo&quot;, &quot;Noto Sans KR&quot;, &quot;Malgun Gothic&quot;, sans-serif;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .stat { background: var(--card); border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .stat b { display: block; font-size: 26px; line-height: 1.1; }
+  .stat span { font-size: 12px; color: var(--muted); }
+  
+  .goal { background: var(--card); border-radius: 12px; padding: 12px 14px; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .goal label { font-size: 13px; color: var(--muted); }
+  .goal input[type=number] { width: 60px; padding: 3px 6px; border: 1px solid #d5dce5; border-radius: 6px; font-size: 14px; }
+  .bar { height: 10px; background: #e8edf3; border-radius: 6px; overflow: hidden; margin-top: 8px; }
+  .bar &gt; i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--lime), var(--green)); transition: width .4s; }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; }
+  .tab { border: 1px solid #d5dce5; background: #fff; padding: 6px 12px; border-radius: 999px; font-size: 13px; cursor: pointer; }
+  .tab.on { background: var(--text); color: #fff; border-color: var(--text); }
+  .spacer { flex: 1; }
+  button.act { border: 0; background: var(--blue1); color: #fff; padding: 8px 14px; border-radius: 10px; font-size: 14px; cursor: pointer; }
+  button.ghost { border: 1px solid #d5dce5; background: #fff; color: var(--text); padding: 7px 12px; border-radius: 10px; font-size: 13px; cursor: pointer; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  /* gradient / solid border via padding wrapper */
+  .frame { padding: 4px; border-radius: 16px; }
+  .frame.req { background: linear-gradient(135deg, var(--blue1), var(--blue2)); }
+  .frame.done { background: linear-gradient(135deg, var(--green), var(--lime)); }
+  .frame.todo { background: linear-gradient(135deg, var(--orange), var(--orange2)); }
+  .frame.free { background: linear-gradient(135deg, var(--violet), var(--violet2)); }
+  .card { background: var(--card); border-radius: 12px; overflow: hidden; height: 100%; display: flex; flex-direction: column; }
+  .thumb { aspect-ratio: 4 / 3; background: #f0f3f7; display: flex; align-items: center; justify-content: center; cursor: zoom-in; }
+  .thumb img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+  .thumb.empty { color: var(--muted); font-size: 13px; cursor: default; }
+  .info { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .badge { align-self: flex-start; font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 600; }
+  .badge.req { background: #e3edff; color: #1f4fcc; }
+  .badge.done { background: #e2f5e9; color: #17743f; }
+  .badge.todo { background: #fff0d9; color: #a85a00; }
+  .badge.free { background: #efe7ff; color: #5b34b8; }
+  .title { font-weight: 600; font-size: 15px; word-break: break-word; }
+  .memo { font-size: 13px; color: var(--muted); white-space: pre-wrap; word-break: break-word; }
+  .meta { font-size: 12px; color: var(--muted); margin-top: auto; padding-top: 6px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .meta a { color: var(--blue1); }
+  .del { border: 0; background: none; color: #b33; cursor: pointer; font-size: 12px; }
+  .edit { border: 0; background: none; color: var(--blue1); cursor: pointer; font-size: 12px; }
+  .title[data-tid] { cursor: text; }
+  .titleinput { width: 100%; font: inherit; font-weight: 600; font-size: 15px; padding: 3px 6px; border: 2px solid var(--blue1); border-radius: 6px; color: var(--text); background: #fff; }
+  .emptymsg { text-align: center; color: var(--muted); padding: 50px 10px; grid-column: 1 / -1; }
+  select.badge { border: 0; cursor: pointer; font-family: inherit; }
+
+  dialog { border: 0; border-radius: 16px; padding: 0; width: min(440px, 92vw); max-height: 90vh; }
+  dialog::backdrop { background: rgba(20,30,45,.45); }
+  .form { padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+  .form h2 { margin: 0 0 4px; font-size: 18px; }
+  .form label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 3px; }
+  .form input[type=text], .form input[type=url], .form textarea, .form input[type=file] {
+    width: 100%; padding: 8px 10px; border: 1px solid #d5dce5; border-radius: 8px; font: inherit; font-size: 14px; background: #fff; color: var(--text);
+  }
+  .form textarea { min-height: 70px; resize: vertical; }
+  .types { display: flex; flex-wrap: wrap; gap: 6px; }
+  .types label { flex: 1 1 45%; margin: 0; }
+  .types input { display: none; }
+  .types span { display: block; text-align: center; padding: 8px 4px; border-radius: 10px; border: 2px solid #d5dce5; font-size: 13px; cursor: pointer; color: var(--text); }
+  .types input:checked + span.req { border-color: var(--blue1); background: #e3edff; }
+  .types input:checked + span.done { border-color: var(--green); background: #e2f5e9; }
+  .types input:checked + span.todo { border-color: var(--orange); background: #fff0d9; }
+  .types input:checked + span.free { border-color: var(--violet); background: #efe7ff; }
+  .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 6px; }
+
+  #viewer img { max-width: 100%; max-height: 80vh; display: block; margin: 0 auto; }
+  #viewer { width: min(900px, 94vw); padding: 12px; }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;h1&gt;⚙️ 업무 엔진&lt;/h1&gt;
+  &lt;p class=&quot;sub&quot;&gt;요청, 완료, 해야 할 일을 한곳에서 굴려요. 하나씩 쌓이는 게 보이면 계속 갈 힘이 생겨요.&lt;/p&gt;
+
+  &lt;div class=&quot;stats&quot;&gt;
+    &lt;div class=&quot;stat&quot;&gt;&lt;b id=&quot;sAll&quot;&gt;0&lt;/b&gt;&lt;span&gt;전체&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;stat&quot;&gt;&lt;b id=&quot;sReq&quot; style=&quot;color:var(--blue1)&quot;&gt;0&lt;/b&gt;&lt;span&gt;요청 받은 일&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;stat&quot;&gt;&lt;b id=&quot;sDone&quot; style=&quot;color:var(--green)&quot;&gt;0&lt;/b&gt;&lt;span&gt;완료&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;stat&quot;&gt;&lt;b id=&quot;sTodo&quot; style=&quot;color:var(--orange)&quot;&gt;0&lt;/b&gt;&lt;span&gt;해야될 것 같은 일&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;stat&quot;&gt;&lt;b id=&quot;sFree&quot; style=&quot;color:var(--violet)&quot;&gt;0&lt;/b&gt;&lt;span&gt;자유 주제&lt;/span&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;goal&quot;&gt;
+    &lt;label&gt;완료 목표 &lt;input type=&quot;number&quot; id=&quot;goalN&quot; min=&quot;1&quot; value=&quot;10&quot;&gt; 개 · 현재 &lt;b id=&quot;goalCur&quot;&gt;0&lt;/b&gt;개&lt;/label&gt;
+    &lt;div class=&quot;bar&quot;&gt;&lt;i id=&quot;goalBar&quot;&gt;&lt;/i&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+
+  &lt;div class=&quot;toolbar&quot;&gt;
+    &lt;button class=&quot;tab on&quot; data-f=&quot;all&quot;&gt;전체&lt;/button&gt;
+    &lt;button class=&quot;tab&quot; data-f=&quot;req&quot;&gt;📩 요청 받은 일&lt;/button&gt;
+    &lt;button class=&quot;tab&quot; data-f=&quot;done&quot;&gt;✅ 완료&lt;/button&gt;
+    &lt;button class=&quot;tab&quot; data-f=&quot;todo&quot;&gt;📝 해야될 것 같은 일&lt;/button&gt;
+    &lt;button class=&quot;tab&quot; data-f=&quot;free&quot;&gt;💡 자유 주제&lt;/button&gt;
+    &lt;div class=&quot;spacer&quot;&gt;&lt;/div&gt;
+    &lt;button class=&quot;ghost&quot; id=&quot;btnExport&quot;&gt;내보내기&lt;/button&gt;
+    &lt;button class=&quot;ghost&quot; id=&quot;btnImport&quot;&gt;가져오기&lt;/button&gt;
+    &lt;button class=&quot;act&quot; id=&quot;btnAdd&quot;&gt;+ 이미지 추가&lt;/button&gt;
+    &lt;input type=&quot;file&quot; id=&quot;importFile&quot; accept=&quot;application/json&quot; hidden&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;grid&quot; id=&quot;grid&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;dialog id=&quot;dlg&quot;&gt;
+  &lt;div class=&quot;form&quot;&gt;
+    &lt;h2&gt;이미지 추가&lt;/h2&gt;
+    &lt;div&gt;
+      &lt;label&gt;분류&lt;/label&gt;
+      &lt;div class=&quot;types&quot;&gt;
+        &lt;label&gt;&lt;input type=&quot;radio&quot; name=&quot;type&quot; value=&quot;req&quot; checked&gt;&lt;span class=&quot;req&quot;&gt;📩 요청 받은 일&lt;/span&gt;&lt;/label&gt;
+        &lt;label&gt;&lt;input type=&quot;radio&quot; name=&quot;type&quot; value=&quot;done&quot;&gt;&lt;span class=&quot;done&quot;&gt;✅ 완료&lt;/span&gt;&lt;/label&gt;
+        &lt;label&gt;&lt;input type=&quot;radio&quot; name=&quot;type&quot; value=&quot;todo&quot;&gt;&lt;span class=&quot;todo&quot;&gt;📝 해야될 것 같은 일&lt;/span&gt;&lt;/label&gt;
+        &lt;label&gt;&lt;input type=&quot;radio&quot; name=&quot;type&quot; value=&quot;free&quot;&gt;&lt;span class=&quot;free&quot;&gt;💡 자유 주제&lt;/span&gt;&lt;/label&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div&gt;&lt;label&gt;제목&lt;/label&gt;&lt;input type=&quot;text&quot; id=&quot;fTitle&quot; placeholder=&quot;예: 업무 내용을 한 줄로&quot;&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;label&gt;이미지 파일&lt;/label&gt;&lt;input type=&quot;file&quot; id=&quot;fFile&quot; accept=&quot;image/*&quot;&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;label&gt;또는 이미지 URL (GitHub raw 등)&lt;/label&gt;&lt;input type=&quot;url&quot; id=&quot;fUrl&quot; placeholder=&quot;https://...&quot;&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;label&gt;메모 (어떤 일인지 / 요청자 / 진행 상황 등)&lt;/label&gt;&lt;textarea id=&quot;fMemo&quot;&gt;&lt;/textarea&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;label&gt;관련 링크 (선택)&lt;/label&gt;&lt;input type=&quot;url&quot; id=&quot;fSrc&quot; placeholder=&quot;https://...&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;row&quot;&gt;
+      &lt;button class=&quot;ghost&quot; id=&quot;fCancel&quot;&gt;취소&lt;/button&gt;
+      &lt;button class=&quot;act&quot; id=&quot;fSave&quot;&gt;저장&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/dialog&gt;
+
+&lt;dialog id=&quot;viewer&quot;&gt;&lt;img id=&quot;viewImg&quot; alt=&quot;&quot;&gt;&lt;div class=&quot;row&quot;&gt;&lt;button class=&quot;ghost&quot; id=&quot;viewClose&quot;&gt;닫기&lt;/button&gt;&lt;/div&gt;&lt;/dialog&gt;
+
+&lt;script&gt;
+(function () {
+  var KEY = &#x27;employee-mate-v1&#x27;;
+  var LABEL = { req: &#x27;요청 받은 일&#x27;, done: &#x27;완료&#x27;, todo: &#x27;해야될 것 같은 일&#x27;, free: &#x27;자유 주제&#x27; };
+  var TYPES = [&#x27;req&#x27;, &#x27;done&#x27;, &#x27;todo&#x27;, &#x27;free&#x27;];
+  // 이전 3분류(관심/내 시뮬/내 실험) 데이터를 새 4분류로 변환
+  var LEGACY = { interest: &#x27;free&#x27;, sim: &#x27;done&#x27;, exp: &#x27;done&#x27; };
+  function migrate(list) {
+    return (list || []).map(function (i) {
+      if (!LABEL[i.type]) i.type = LEGACY[i.type] || &#x27;free&#x27;;
+      return i;
+    });
+  }
+  var items = [], filter = &#x27;all&#x27;, goal = 10;
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) { var d = JSON.parse(raw); items = migrate(d.items); goal = d.goal || 10; }
+    } catch (e) { items = []; }
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify({ items: items, goal: goal })); }
+    catch (e) { alert(&#x27;저장 공간이 부족해요. 내보내기로 백업하거나 이미지 대신 URL을 써 보세요.&#x27;); }
+  }
+  function esc(s) { return String(s || &#x27;&#x27;).replace(/[&amp;&lt;&gt;&quot;&#x27;]/g, function (c) { return { &#x27;&amp;&#x27;: &#x27;&amp;amp;&#x27;, &#x27;&lt;&#x27;: &#x27;&amp;lt;&#x27;, &#x27;&gt;&#x27;: &#x27;&amp;gt;&#x27;, &#x27;&quot;&#x27;: &#x27;&amp;quot;&#x27;, &quot;&#x27;&quot;: &#x27;&amp;#39;&#x27; }[c]; }); }
+  function safeUrl(u) { return /^https?:\/\//i.test(u || &#x27;&#x27;) ? u : &#x27;&#x27;; }
+  function safeImg(u) { return /^(https?:\/\/|data:image\/)/i.test(u || &#x27;&#x27;) ? u : &#x27;&#x27;; }
+
+  function render() {
+    var n = { req: 0, done: 0, todo: 0, free: 0 };
+    items.forEach(function (i) { n[i.type]++; });
+    document.getElementById(&#x27;sAll&#x27;).textContent = items.length;
+    document.getElementById(&#x27;sReq&#x27;).textContent = n.req;
+    document.getElementById(&#x27;sDone&#x27;).textContent = n.done;
+    document.getElementById(&#x27;sTodo&#x27;).textContent = n.todo;
+    document.getElementById(&#x27;sFree&#x27;).textContent = n.free;
+    var mine = n.done;
+    document.getElementById(&#x27;goalCur&#x27;).textContent = mine;
+    document.getElementById(&#x27;goalN&#x27;).value = goal;
+    document.getElementById(&#x27;goalBar&#x27;).style.width = Math.min(100, mine / goal * 100) + &#x27;%&#x27;;
+
+    var list = items.filter(function (i) { return filter === &#x27;all&#x27; || i.type === filter; });
+    var g = document.getElementById(&#x27;grid&#x27;);
+    if (!list.length) { g.innerHTML = &#x27;&lt;div class=&quot;emptymsg&quot;&gt;아직 없어요. 첫 이미지를 추가해 보세요.&lt;/div&gt;&#x27;; return; }
+    g.innerHTML = list.map(function (i) {
+      var img = safeImg(i.img), src = safeUrl(i.src);
+      return &#x27;&lt;div class=&quot;frame &#x27; + i.type + &#x27;&quot;&gt;&lt;div class=&quot;card&quot;&gt;&#x27; +
+        (img ? &#x27;&lt;div class=&quot;thumb&quot; data-view=&quot;&#x27; + i.id + &#x27;&quot;&gt;&lt;img src=&quot;&#x27; + esc(img) + &#x27;&quot; alt=&quot;&quot;&gt;&lt;/div&gt;&#x27; : &#x27;&lt;div class=&quot;thumb empty&quot;&gt;이미지 없음&lt;/div&gt;&#x27;) +
+        &#x27;&lt;div class=&quot;info&quot;&gt;&lt;select class=&quot;badge &#x27; + i.type + &#x27;&quot; data-type=&quot;&#x27; + i.id + &#x27;&quot; title=&quot;분류 변경&quot;&gt;&#x27; + TYPES.map(function (t) { return &#x27;&lt;option value=&quot;&#x27; + t + &#x27;&quot;&#x27; + (t === i.type ? &#x27; selected&#x27; : &#x27;&#x27;) + &#x27;&gt;&#x27; + LABEL[t] + &#x27;&lt;/option&gt;&#x27;; }).join(&#x27;&#x27;) + &#x27;&lt;/select&gt;&#x27; +
+        &#x27;&lt;div class=&quot;title&quot; data-tid=&quot;&#x27; + i.id + &#x27;&quot; title=&quot;클릭해서 제목 수정&quot;&gt;&#x27; + esc(i.title || &#x27;(제목 없음)&#x27;) + &#x27;&lt;/div&gt;&#x27; +
+        (i.memo ? &#x27;&lt;div class=&quot;memo&quot;&gt;&#x27; + esc(i.memo) + &#x27;&lt;/div&gt;&#x27; : &#x27;&#x27;) +
+        &#x27;&lt;div class=&quot;meta&quot;&gt;&lt;span&gt;&#x27; + esc(i.date) + (src ? &#x27; · &lt;a href=&quot;&#x27; + esc(src) + &#x27;&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;출처&lt;/a&gt;&#x27; : &#x27;&#x27;) + &#x27;&lt;/span&gt;&#x27; +
+        &#x27;&lt;span&gt;&lt;button class=&quot;edit&quot; data-edit=&quot;&#x27; + i.id + &#x27;&quot;&gt;제목 수정&lt;/button&gt;&lt;button class=&quot;del&quot; data-del=&quot;&#x27; + i.id + &#x27;&quot;&gt;삭제&lt;/button&gt;&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&#x27;;
+    }).join(&#x27;&#x27;);
+  }
+
+  function resize(file, cb) {
+    var r = new FileReader();
+    r.onload = function () {
+      var im = new Image();
+      im.onload = function () {
+        var max = 900, s = Math.min(1, max / Math.max(im.width, im.height));
+        var c = document.createElement(&#x27;canvas&#x27;);
+        c.width = Math.round(im.width * s); c.height = Math.round(im.height * s);
+        var x = c.getContext(&#x27;2d&#x27;); x.fillStyle = &#x27;#fff&#x27;; x.fillRect(0, 0, c.width, c.height);
+        x.drawImage(im, 0, 0, c.width, c.height);
+        cb(c.toDataURL(&#x27;image/jpeg&#x27;, 0.85));
+      };
+      im.onerror = function () { cb(&#x27;&#x27;); };
+      im.src = r.result;
+    };
+    r.readAsDataURL(file);
+  }
+
+  var dlg = document.getElementById(&#x27;dlg&#x27;);
+  document.getElementById(&#x27;btnAdd&#x27;).onclick = function () {
+    [&#x27;fTitle&#x27;, &#x27;fUrl&#x27;, &#x27;fMemo&#x27;, &#x27;fSrc&#x27;].forEach(function (id) { document.getElementById(id).value = &#x27;&#x27;; });
+    document.getElementById(&#x27;fFile&#x27;).value = &#x27;&#x27;;
+    dlg.showModal();
+  };
+  document.getElementById(&#x27;fCancel&#x27;).onclick = function () { dlg.close(); };
+  document.getElementById(&#x27;fSave&#x27;).onclick = function () {
+    var type = document.querySelector(&#x27;input[name=type]:checked&#x27;).value;
+    var base = {
+      id: Date.now() + &#x27;&#x27; + Math.floor(Math.random() * 1000), type: type,
+      title: document.getElementById(&#x27;fTitle&#x27;).value.trim(),
+      memo: document.getElementById(&#x27;fMemo&#x27;).value.trim(),
+      src: document.getElementById(&#x27;fSrc&#x27;).value.trim(),
+      date: new Date().toISOString().slice(0, 10), img: &#x27;&#x27;
+    };
+    var f = document.getElementById(&#x27;fFile&#x27;).files[0];
+    var url = document.getElementById(&#x27;fUrl&#x27;).value.trim();
+    function done(img) { base.img = img; items.unshift(base); save(); render(); dlg.close(); }
+    if (f) resize(f, done); else done(url);
+  };
+
+  function startEdit(id) {
+    var el = document.querySelector(&#x27;[data-tid=&quot;&#x27; + id + &#x27;&quot;]&#x27;);
+    var it = items.filter(function (i) { return i.id === id; })[0];
+    if (!el || !it) return;
+    var inp = document.createElement(&#x27;input&#x27;);
+    inp.type = &#x27;text&#x27;; inp.className = &#x27;titleinput&#x27;; inp.value = it.title || &#x27;&#x27;;
+    el.replaceWith(inp); inp.focus(); inp.select();
+    var finished = false;
+    function finish(ok) {
+      if (finished) return; finished = true;
+      if (ok) { it.title = inp.value.trim(); save(); }
+      render();
+    }
+    inp.addEventListener(&#x27;keydown&#x27;, function (ev) {
+      if (ev.key === &#x27;Enter&#x27;) finish(true);
+      else if (ev.key === &#x27;Escape&#x27;) finish(false);
+    });
+    inp.addEventListener(&#x27;blur&#x27;, function () { finish(true); });
+  }
+
+  document.getElementById(&#x27;grid&#x27;).addEventListener(&#x27;click&#x27;, function (e) {
+    var ed = e.target.closest(&#x27;[data-edit],[data-tid]&#x27;);
+    if (ed) { startEdit(ed.dataset.edit || ed.dataset.tid); return; }
+    var d = e.target.closest(&#x27;[data-del]&#x27;);
+    if (d) {
+      if (confirm(&#x27;이 항목을 삭제할까요?&#x27;)) { items = items.filter(function (i) { return i.id !== d.dataset.del; }); save(); render(); }
+      return;
+    }
+    var v = e.target.closest(&#x27;[data-view]&#x27;);
+    if (v) {
+      var it = items.filter(function (i) { return i.id === v.dataset.view; })[0];
+      if (it) { document.getElementById(&#x27;viewImg&#x27;).src = safeImg(it.img); document.getElementById(&#x27;viewer&#x27;).showModal(); }
+    }
+  });
+  document.getElementById(&#x27;viewClose&#x27;).onclick = function () { document.getElementById(&#x27;viewer&#x27;).close(); };
+
+  document.querySelectorAll(&#x27;.tab&#x27;).forEach(function (t) {
+    t.onclick = function () {
+      document.querySelectorAll(&#x27;.tab&#x27;).forEach(function (x) { x.classList.remove(&#x27;on&#x27;); });
+      t.classList.add(&#x27;on&#x27;); filter = t.dataset.f; render();
+    };
+  });
+  document.getElementById(&#x27;goalN&#x27;).onchange = function (e) { goal = Math.max(1, parseInt(e.target.value, 10) || 10); save(); render(); };
+
+  document.getElementById(&#x27;grid&#x27;).addEventListener(&#x27;change&#x27;, function (e) {
+    var s = e.target.closest(&#x27;[data-type]&#x27;);
+    if (!s) return;
+    var it = items.filter(function (i) { return i.id === s.dataset.type; })[0];
+    if (it &amp;&amp; LABEL[s.value]) { it.type = s.value; save(); render(); }
+  });
+
+  document.getElementById(&#x27;btnExport&#x27;).onclick = function () {
+    var blob = new Blob([JSON.stringify({ items: items, goal: goal })], { type: &#x27;application/json&#x27; });
+    var a = document.createElement(&#x27;a&#x27;); a.href = URL.createObjectURL(blob); a.download = &#x27;work-engine.json&#x27;; a.click();
+  };
+  document.getElementById(&#x27;btnImport&#x27;).onclick = function () { document.getElementById(&#x27;importFile&#x27;).click(); };
+  document.getElementById(&#x27;importFile&#x27;).onchange = function (e) {
+    var f = e.target.files[0]; if (!f) return;
+    var r = new FileReader();
+    r.onload = function () {
+      try { var d = JSON.parse(r.result); items = migrate(d.items); goal = d.goal || 10; save(); render(); }
+      catch (err) { alert(&#x27;파일을 읽을 수 없어요.&#x27;); }
+    };
+    r.readAsText(f);
+  };
+
+  load(); render();
+})();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe>
+</div>
+<script>
+(function () {
+  var K = 'mate-active-tab';
+  var tabs = document.querySelectorAll('.toptab');
+  function show(t) {
+    tabs.forEach(function (b) { b.classList.toggle('on', b.dataset.t === t); });
+    document.querySelectorAll('.pane').forEach(function (p) { p.classList.toggle('on', p.id === 'p-' + t); });
+    try { localStorage.setItem(K, t); } catch (e) {}
+  }
+  tabs.forEach(function (b) { b.addEventListener('click', function () { show(b.dataset.t); }); });
+  var saved = null;
+  try { saved = localStorage.getItem(K); } catch (e) {}
+  if (saved === 'graph' || saved === 'work') show(saved);
+})();
+</script>
+</body>
+</html>
