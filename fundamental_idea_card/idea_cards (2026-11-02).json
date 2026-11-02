@@ -19,6 +19,13 @@
   "neighbors": []
  },
  {
+  "device": "(위-광각버전)",
+  "vision": "",
+  "tex": "H_{prop}=exp(i\\frac{k_{\\perp}^2}{\\sqrt{\\bar{k}^2-k_{\\perp}^2}+\\bar{k}})\n\\\\[4pt]\nin \\ fact : \\\\[4pt] \nH_{prop}=e^{i(k_z-\\bar{k})\\Delta z}, \\ by\\ Slowly\\ Varing \\ Assumption.\n\\\\[4pt]\nk_z=\\sqrt{\\bar{k}^2-k^2_{\\perp}}",
+  "hurdle": "",
+  "neighbors": []
+ },
+ {
   "device": "Fiber Tip Disc",
   "vision": "머리카락 굵기의 유리 기둥이 한층 더 미세하게 조각 됩니다.\nThe hair thick glass cylinder is once again sculpted in sophisticated way.\nLa tube en verre de taille d'un cheveu va encore etre sculptee d'une maniere raffinee",
   "tex": "L_{neck}, \\qquad H_{disc}, \\qquad \\phi_{neck}, \\qquad \\phi_{disc}",
