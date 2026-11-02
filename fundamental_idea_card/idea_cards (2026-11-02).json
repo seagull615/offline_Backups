@@ -1,0 +1,28 @@
+[
+ {
+  "device": "Fiber Tip Lens",
+  "vision": "빛이 한 방향으로 진행하여 좁게 모입니다.\nThe light goes in one direction and focuses tightly.\nLa lumiere va dans une direction et se concentre etroitement.",
+  "tex": "\n\\Psi_+\n=\nifft \\left[ FFt\\left\\{ e^{i\\bar{R}}\\Psi \\right\\}e^{i\\bar{P}} \\right]\n\\\\[4pt]\nL_{grin},\\qquad L_{step},\\qquad L_{CSF}\n\\\\[4pt]\nn_{grin},\\qquad n_{step}, \\qquad n_{CSF}, \\qquad n_{material}\n\\\\[4pt]\n-------------------\n\\\\[4pt]\nw_{focus}\n\n\n",
+  "hurdle": "초첨 MFD 20 um at red laser",
+  "neighbors": [
+   {
+    "src": "정기훈1",
+    "body": "2.6 um beam waist at 488 nm"
+   }
+  ]
+ },
+ {
+  "device": "Beam Propagating in Homogeneous Medium in Paraxial Assumption",
+  "vision": "수평선을 스치는 빛의 관점에서 한 겹의 물질 공간이 행하는 일\nThe work that done by a layer of volume in the regard of light.\nLe travail fait par une couche d'esapce dans l'egard de lumiere.",
+  "tex": "\\Psi(x,y,z+\\Delta z) = F^{-1}\\left\\{ H_{prop}\\cdot F\\left[\\Psi(x,y,z) \\right] \\right\\}\n\\\\[4pt]\nH_{prop} = exp(-i\\frac{k^2_x+k^2_y}{2\\bar{k}}\\Delta z), \\qquad \\bar{k}=n_0k_0",
+  "hurdle": "",
+  "neighbors": []
+ },
+ {
+  "device": "Fiber Tip Disc",
+  "vision": "머리카락 굵기의 유리 기둥이 한층 더 미세하게 조각 됩니다.\nThe hair thick glass cylinder is once again sculpted in sophisticated way.\nLa tube en verre de taille d'un cheveu va encore etre sculptee d'une maniere raffinee",
+  "tex": "L_{neck}, \\qquad H_{disc}, \\qquad \\phi_{neck}, \\qquad \\phi_{disc}",
+  "hurdle": "disc Dia - 40um / Neck Dia - 25um",
+  "neighbors": []
+ }
+]
