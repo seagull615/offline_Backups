@@ -1,0 +1,70 @@
+[
+ {
+  "type": "idea",
+  "device": "Fiber Tip Lens",
+  "vision": "빛이 한 방향으로 진행하여 좁게 모입니다.\n",
+  "tex": "\n\\Psi_+\n=\nifft \\left[ FFt\\left\\{ e^{i\\bar{R}}\\Psi \\right\\}e^{i\\bar{P}} \\right]\n\\\\[4pt]\nL_{grin},\\qquad L_{step},\\qquad L_{CSF}\n\\\\[4pt]\nn_{grin},\\qquad n_{step}, \\qquad n_{CSF}, \\qquad n_{material}\n\\\\[4pt]\n-------------------\n\\\\[4pt]\nw_{focus}\n\n\n",
+  "hurdle": "초첨 MFD 20 um at red laser",
+  "neighbors": [
+   {
+    "src": "정기훈1",
+    "body": "2.6 um beam waist at 488 nm"
+   }
+  ]
+ },
+ {
+  "type": "idea",
+  "device": "Beam Propagating in Homogeneous Medium in Paraxial Assumption",
+  "vision": "수평선을 스치는 빛의 관점에서 한 겹의 물질 공간이 행하는 일\n",
+  "tex": "\\Psi(x,y,z+\\Delta z) = F^{-1}\\left\\{ H_{prop}\\cdot F\\left[\\Psi(x,y,z) \\right] \\right\\}\n\\\\[4pt]\nH_{prop} = exp(-i\\frac{k^2_x+k^2_y}{2\\bar{k}}\\Delta z), \\qquad \\bar{k}=n_0k_0",
+  "hurdle": "",
+  "neighbors": []
+ },
+ {
+  "type": "idea",
+  "device": "Beam Propagating in Homogeneous Medium in Paraxial Assumption (Wide-angle version)",
+  "vision": "수평선을 스치는 빛의 관점에서 한 겹의 물질 공간이 행하는 일",
+  "tex": "H_{prop}=exp(i\\frac{k_{\\perp}^2}{\\sqrt{\\bar{k}^2-k_{\\perp}^2}+\\bar{k}})\n\\\\[4pt]\nin \\ fact : \\\\[4pt] \nH_{prop}=e^{i(k_z-\\bar{k})\\Delta z}, \\ by\\ Slowly\\ Varing \\ Assumption.\n\\\\[4pt]\nk_z=\\sqrt{\\bar{k}^2-k^2_{\\perp}}",
+  "hurdle": "",
+  "neighbors": []
+ },
+ {
+  "type": "idea",
+  "device": "Refractive Component analysed in layer",
+  "vision": "빛의 퍼짐과 한 겹의 공간에 굴절-물질의 분포가 다뤄지다.\n",
+  "tex": "\\Psi_+=exp(i k_0\\delta n\\Delta z)\\Psi, \\qquad k_0=\\frac{2\\pi}{\\lambda_0} \\\\[4pt]\nn(r)=\\bar{n}+\\delta n(r), \\qquad \\bar{n}:background-RI (=n_{cladding}) \\\\[4pt]\n\\delta n(r)=n(r)-\\bar{n} \\\\[4pt]\n\\text{in homogenous space :}\\\\  \\Psi_+=exp(i k_0\\delta \\cdot 0\\cdot \\Delta z)\\Psi\n\n",
+  "hurdle": "",
+  "neighbors": []
+ },
+ {
+  "type": "idea",
+  "device": "Refractive Component in glass guiding component",
+  "vision": "빛을 길들여 나아가게 하다.",
+  "tex": "n_{step}(r) = \\begin{cases}\nn_{core,\\  1}, & r<a \\\\\nn_{cladding,\\ 2}, & r \\geq a\n\\end{cases}\n\\\\[4pt]\nn_{grin}(r)= \\begin{cases}\nn_1(1-2\\Delta\\left\\{ (\\frac{r}{a})^\\alpha\\right\\})^{1/2}, & r<a \\\\\nn_2=n_1(1-2\\Delta)^{1/2}, & r \\geq a\n\\end{cases}\n\\\\[4pt]\n\\Delta=(n^2_1-n^2_2)/2n^2_1",
+  "hurdle": "",
+  "neighbors": []
+ },
+ {
+  "type": "matlab",
+  "title": "기본 도메인 추가 (공간 및 주파수)",
+  "code": "function [r, t, dt, df, L, N, info] = makeGrid(L,N)\n\ndt = 2*L/N;\nt = (-N/2:N/2-1)*dt;\ndf = 1/(2*L);\n[Xv,Yv] = meshgrid(t,t);\nr = sqrt(Xv.^2 + Yv.^2);\n    info = struct('N', N, 'Lmax', max(t), 'dt', dt, 'df', df)\nend\n"
+ },
+ {
+  "type": "matlab",
+  "title": "구성품 정보 입력",
+  "code": "function [n1, n2, a1, L1] = components_step(n_core, n_background, a, L)\n    n1 = n_core; \n    n2 = n_background; \n    L1 = L;\n    a1 = a;\nend\n\nfunction [n3, L2] = components_CSF(n_silica, L)\n    n3 = n_silica;\n    L2 = L;\nend\n\nfunction [n4, D1, A1, a2, L3] = components_grin(n_core, Delta, alpha, a, L)\n    n4 = n_core;\n    D1 = Delta;\n    A1 = alpha;\n    L3 = L;\n    a2 = a;\nend\n\n\nfunction [n5, L4] = components_material(n_material, L)\n    n5 = n_material;\n    L4 = L;\nend\n"
+ },
+ {
+  "type": "matlab",
+  "title": "RI-profile 생성",
+  "code": "function RIP1 =  make_stepRI_profile(n1, n2, a1, r)\n    RIP1 = n2 + double(r < a1) * (n1 - n2);\nend\n\nfunction RIP2 =  make_grinRI_profile(n4, D1, A1, a2, r)\n    n_cladding = n4*(1-2*D1)^0.5;\n    n_core = n4*sqrt(1-2*D1*((r/a2).^A1));\n    RIP2=n_core.*double(r < a2)+n_cladding.*double(r >= a2); \nend\n\n\n"
+ },
+ {
+  "type": "idea",
+  "device": "Fiber Tip Disc",
+  "vision": "머리카락 굵기의 유리 기둥이 한층 더 미세하게 조각 됩니다.\n",
+  "tex": "L_{neck}, \\qquad H_{disc}, \\qquad \\phi_{neck}, \\qquad \\phi_{disc}",
+  "hurdle": "disc Dia - 40um / Neck Dia - 25um",
+  "neighbors": []
+ }
+]
