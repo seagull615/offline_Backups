@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>소자 아이디어 카드</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<style>
+:root{--bg:#eef0ee;--ink:#1d2b30;--sub:#5d6b70;--line:#b9c3c5;--acc:#1f5f73;--chip:#fff3d6;--chipb:#e2b958;--code:#f4f6f5;--hur:#a4452c;--hurbg:#fbefe9}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif}
+.bar{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);padding:10px 16px}
+.r1{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.bar h1{font-size:16px;margin:0 12px 0 0}
+.cnt{color:var(--sub);font-size:13px;margin-left:auto}
+button{font:inherit;font-size:13px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:5px 10px;border-radius:6px;cursor:pointer}
+button:hover{border-color:var(--acc)}
+button.main{background:var(--acc);color:#fff;border-color:var(--acc)}
+.snips{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;align-items:center}
+.snips.off{display:none}
+.snips .lab{font-size:12px;color:var(--sub);margin-right:2px}
+.snips button{background:var(--chip);border-color:var(--chipb);padding:3px 8px;font-size:13px}
+.snips .gap{width:10px}
+.gh{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.gh .lab{font-size:12px;color:var(--sub)}
+.gh input,.gh select{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:6px;padding:4px 8px;background:#fff;color:var(--ink);max-width:100%}
+.hint{font-size:12px;color:var(--sub);margin-top:6px;line-height:1.5}
+
+.paper{max-width:210mm;margin:16px auto 40px;background:#fff;box-shadow:0 1px 6px rgba(0,0,0,.18);padding:6mm 10mm}
+.entry{position:relative;padding:3mm 0 4mm;border-bottom:1.5px solid var(--acc)}
+.blk{display:grid;grid-template-columns:7.5em 1fr;gap:3mm;margin:1.5mm 0;align-items:start}
+.lab{font-size:11px;color:var(--sub);padding-top:6px;line-height:1.3}
+.lab b{color:var(--acc);margin-right:3px}
+.f{outline:none;white-space:pre-wrap;word-break:break-word;border-radius:3px;min-height:1.7em;padding:3px 5px}
+.f:focus{background:#f3f8fa;box-shadow:0 0 0 1px #9cc3cf}
+.f.empty::before{content:attr(data-ph);color:#9aa8ac;font-weight:400;pointer-events:none}
+.device{font-weight:700;font-size:13pt;color:var(--acc);padding-right:48mm}
+.vision{font-size:11pt;line-height:1.5}
+.tex{font-family:Consolas,"D2Coding","Courier New",monospace;font-size:9.5pt;line-height:1.45;background:var(--code)}
+.prev{min-height:2.4em;padding:2px 5px;overflow-x:auto;overflow-y:hidden}
+.prev .katex-display{margin:.4em 0}
+.prev.empty::before{content:"";font-size:12px}
+.mathwrap{min-width:0}
+.nbs{display:flex;flex-direction:column;gap:2mm;min-width:0}
+.nb{border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:4px;padding:2px 4px 3px;position:relative}
+.nb .src{font-size:10.5pt;font-weight:600;padding-right:22px}
+.nb .body{font-size:10.5pt;line-height:1.5}
+.nb .x{position:absolute;top:2px;right:2px;padding:0 6px;font-size:11px;opacity:0}
+.nb:hover .x,.nb:focus-within .x{opacity:1}
+.addnb{align-self:flex-start;font-size:12px;padding:2px 9px;color:var(--sub);border-style:dashed}
+.hurdle{font-size:11pt;line-height:1.5;font-weight:600;color:var(--hur);background:var(--hurbg)}
+.hurdle:focus{background:#fdf3ee}
+.tools{position:absolute;top:2mm;right:0;display:flex;gap:3px;opacity:0}
+.entry:hover .tools,.entry:focus-within .tools{opacity:1}
+.tools button{padding:1px 7px;font-size:11px}
+
+.entry.m{border-bottom-color:#b5651d}
+.mtag{position:absolute;top:3mm;right:46mm;font-size:10px;font-weight:700;color:#fff;background:#b5651d;border-radius:3px;padding:1px 6px}
+.mcode{font-family:Consolas,"D2Coding","Courier New",monospace;font-size:9.5pt;line-height:1.45;background:var(--code);min-height:6em;tab-size:4}
+.entry.m .lab b{color:#b5651d}
+@page{size:A4;margin:10mm}
+@media print{
+ body{background:#fff}
+ .bar,.gh,.tools,.nb .x,.addnb{display:none}
+ .paper{margin:0;box-shadow:none;padding:0;max-width:none}
+ .entry{break-inside:avoid;page-break-inside:avoid}
+ .f.empty::before,.prev.empty::before{content:""}
+ .f:focus{background:none;box-shadow:none}
+}
+</style>
+</head>
+<body>
+<div class="bar">
+ <div class="r1">
+  <h1>소자 아이디어 카드</h1>
+  <button class="main" id="add">카드 추가</button>
+  <button class="main" id="addm" style="background:#b5651d;border-color:#b5651d">MATLAB 코드 추가</button>
+  <button id="copyall" style="background:#b5651d;border-color:#b5651d;color:#fff">MATLAB 코드 전체 복사</button>
+  <button id="copynames" style="background:#b5651d;border-color:#b5651d;color:#fff">함수 선언 줄만 복사</button>
+  <button id="print">인쇄</button>
+  <button id="exp">JSON 저장</button>
+  <button id="imp">불러오기</button>
+  <input type="file" id="file" accept=".json" hidden>
+  <span class="cnt" id="cnt"></span>
+ </div>
+ <div class="gh">
+  <span class="lab">GitHub</span>
+  <input id="ghrepo" placeholder="사용자/저장소 (예: seagull615/repo)" size="26">
+  <input id="ghbranch" placeholder="브랜치" size="7">
+  <input id="ghdir" placeholder="JSON 폴더 (비우면 루트)" size="20">
+  <button id="ghlist">목록 보기</button>
+  <select id="ghsel"><option value="">(목록을 먼저 불러오세요)</option></select>
+  <button id="ghload">선택 불러오기</button>
+  <button id="ghlatest" class="main">최신 불러오기</button>
+ </div>
+ <div class="hint">카드마다 ① 소자(목표 시스템) ② 비전 ③ 공학 수학 ④ 이웃 ⑤ 허들 순서입니다. ③은 아래 칸에 LaTeX를 직접 입력하면 위에 수식으로 나타납니다. ④는 논문 하나가 작은 카드 하나이고, “이웃 추가”로 늘립니다. 소자 칸에서 Enter를 누르면 비전 칸으로 이동합니다.</div>
+</div>
+<div class="paper" id="paper"></div>
+<script>
+const KEY='idea_cards_v1';
+const blank=(t)=>t==='matlab'?{type:'matlab',title:'',code:''}:{type:'idea',device:'',vision:'',tex:'',neighbors:[],hurdle:''};
+let cards=[],last=null;
+try{cards=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){cards=[]}
+function norm(d){
+  if(!Array.isArray(d))return null;
+  const out=d.map(c=>{
+    if(!c||typeof c!=='object')return null;
+    if(c.type==='matlab')return{type:'matlab',title:c.title||'',code:c.code||''};
+    return{type:'idea',
+      device:c.device||c.title||'',vision:c.vision||'',tex:c.tex||'',hurdle:c.hurdle||'',
+      neighbors:Array.isArray(c.neighbors)?c.neighbors.map(n=>({src:(n&&n.src)||'',body:(n&&n.body)||''})):[]
+    };
+  }).filter(Boolean);
+  return out.length?out:null;
+}
+cards=norm(cards)||[blank()];
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(cards))}catch(e){}};
+const $=id=>document.getElementById(id);
+
+function sync(d){d.classList.toggle('empty',!d.innerText.trim())}
+function renderPrev(p,tex){
+  p.innerHTML='';
+  if(!tex.trim()){p.classList.add('empty');return}
+  p.classList.remove('empty');
+  if(!window.katex){p.textContent=tex;return}
+  try{katex.render(tex,p,{throwOnError:false,displayMode:true,errorColor:'#c0392b'})}catch(e){p.textContent=tex}
+}
+function F(cls,ph,val,at,extra){
+  const d=document.createElement('div');d.className='f '+cls;d.contentEditable='plaintext-only';
+  d.dataset.ph=ph;d.dataset.at=at;if(extra!==undefined)d.dataset.n=extra;
+  d.innerText=(val&&val.trim())?val:'';sync(d);return d;
+}
+function blk(no,label,node){
+  const b=document.createElement('div');b.className='blk';
+  const l=document.createElement('div');l.className='lab';l.innerHTML='<b>'+no+'</b>'+label;
+  b.append(l,node);return b;
+}
+function makeNb(n,j){
+  const el=document.createElement('div');el.className='nb';
+  const x=document.createElement('button');x.className='x';x.textContent='×';x.dataset.a='delnb';x.dataset.n=j;
+  el.append(F('src','출처 (저자, 연도, 제목)',n.src,'nb-src',j),F('body','논문에 나온 내용',n.body,'nb-body',j),x);
+  return el;
+}
+function makeEntry(c,i){
+  const el=document.createElement('div');el.className='entry'+(c.type==='matlab'?' m':'');el.dataset.i=i;
+  const isM=c.type==='matlab';
+  el.innerHTML=(isM?'<span class="mtag">MATLAB</span>':'')+'<div class="tools">'+(isM?'<button data-a="copy">복사</button><button data-a="m">.m 저장</button>':'')+'<button data-a="up">↑</button><button data-a="down">↓</button><button data-a="ins">+아래</button><button data-a="dup">복제</button><button data-a="del">삭제</button></div>';
+  if(isM){
+    el.append(blk('1','제목<br>(함수/주제)',F('device mtitle','함수 / 주제 (예: beam_profile.m)',c.title,'title')),
+      blk('2','MATLAB<br>코드',F('mcode','MATLAB 코드를 붙여넣거나 입력하세요 (Tab = 들여쓰기)',c.code,'code')));
+    return el;
+  }
+  const prev=document.createElement('div');prev.className='prev empty';renderPrev(prev,c.tex);
+  const mw=document.createElement('div');mw.className='mathwrap';
+  mw.append(prev,F('tex','LaTeX',c.tex,'tex'));
+  const nbs=document.createElement('div');nbs.className='nbs';
+  c.neighbors.forEach((n,j)=>nbs.append(makeNb(n,j)));
+  const ab=document.createElement('button');ab.className='addnb';ab.dataset.a='addnb';ab.textContent='+ 이웃 추가';nbs.append(ab);
+  el.append(
+    blk('1','소자<br>(목표 시스템)',F('device','소자 / 목표 시스템 (예: fiber tip lens)',c.device,'device')),
+    blk('2','비전',F('vision','소자가 이루어야 할 원리 (예: 빛이 공간에 일정하게 분포한다)',c.vision,'vision')),
+    blk('3','공학 수학',mw),
+    blk('4','이웃',nbs),
+    blk('5','허들',F('hurdle','내가 구현할 목표 (예: 초점 빔 waist 50 μm)',c.hurdle,'hurdle'))
+  );
+  return el;
+}
+function render(){
+  const p=$('paper');p.innerHTML='';
+  cards.forEach((c,i)=>p.append(makeEntry(c,i)));
+  $('cnt').textContent=cards.length+'개';
+}
+const paper=$('paper');
+paper.addEventListener('input',e=>{
+  const t=e.target,entry=t.closest('.entry');if(!entry||!t.dataset.at)return;
+  const c=cards[+entry.dataset.i],at=t.dataset.at;
+  if(at==='nb-src'||at==='nb-body'){c.neighbors[+t.dataset.n][at==='nb-src'?'src':'body']=t.innerText}
+  else c[at]=t.innerText;
+  sync(t);
+  if(at==='tex')renderPrev(entry.querySelector('.prev'),c.tex);
+  save();
+});
+paper.addEventListener('keydown',e=>{
+  const t=e.target;
+  if(e.key==='Tab'&&t.dataset&&t.dataset.at==='code'){e.preventDefault();document.execCommand('insertText',false,'    ');return}if(e.key!=='Enter'||e.shiftKey||!t.dataset||t.dataset.at!=='device')return;
+  e.preventDefault();t.closest('.entry').querySelector('.vision').focus();
+});
+paper.addEventListener('mousedown',e=>{if(e.target.tagName==='BUTTON')e.preventDefault()});
+paper.addEventListener('click',e=>{
+  const a=e.target.dataset&&e.target.dataset.a;if(!a)return;
+  const entry=e.target.closest('.entry'),i=+entry.dataset.i;
+  let focusAt=null,focusNb=null;
+  if(a==='addnb'){cards[i].neighbors.push({src:'',body:''});focusNb=cards[i].neighbors.length-1}
+  else if(a==='delnb'){cards[i].neighbors.splice(+e.target.dataset.n,1)}
+  else if(a==='dup')cards.splice(i+1,0,JSON.parse(JSON.stringify(cards[i])));
+  else if(a==='ins'){cards.splice(i+1,0,blank(cards[i].type));focusAt=i+1}
+  else if(a==='copy'){navigator.clipboard&&navigator.clipboard.writeText(cards[i].code);e.target.textContent='복사됨';setTimeout(()=>e.target.textContent='복사',1200);return}
+  else if(a==='m'){const x=document.createElement('a');x.href=URL.createObjectURL(new Blob([cards[i].code],{type:'text/plain'}));x.download=((cards[i].title||'code').replace(/\.m$/i,'').replace(/[\\/:*?"<>|\s]+/g,'_')||'code')+'.m';x.click();return}
+  else if(a==='del'){if(!confirm('이 카드를 삭제할까요?'))return;cards.splice(i,1);if(!cards.length)cards=[blank()]}
+  else if(a==='up'&&i>0){[cards[i-1],cards[i]]=[cards[i],cards[i-1]]}
+  else if(a==='down'&&i<cards.length-1){[cards[i+1],cards[i]]=[cards[i],cards[i+1]]}
+  save();render();
+  if(focusAt!==null)document.querySelectorAll('.entry')[focusAt].querySelector('.device').focus();
+  if(focusNb!==null)document.querySelectorAll('.entry')[i].querySelectorAll('.nb .src')[focusNb].focus();
+});
+
+
+const addCard=t=>{cards.push(blank(t));save();render();
+  const t2=[...document.querySelectorAll('.device')].pop();t2.scrollIntoView({block:'center'});t2.focus()};
+$('add').onclick=()=>addCard('idea');
+$('addm').onclick=()=>addCard('matlab');
+
+async function copyText(txt,btn){
+  try{await navigator.clipboard.writeText(txt)}
+  catch(e){const t=document.createElement('textarea');t.value=txt;document.body.append(t);t.select();document.execCommand('copy');t.remove()}
+  const o=btn.dataset.o||btn.textContent;btn.dataset.o=o;btn.textContent='복사됨 ✓';setTimeout(()=>btn.textContent=o,1200);
+}
+const mcards=()=>cards.filter(c=>c.type==='matlab'&&(c.code.trim()||c.title.trim()));
+const sigs=c=>{
+  const out=[],re=/^[ \t]*function\s+(.+)$/gm;let m;
+  while((m=re.exec(c.code))){out.push(m[1].replace(/\s*%.*$/,'').replace(/;\s*$/,'').trim())}
+  return out;
+};
+$('copyall').onclick=e=>{
+  const l=mcards();if(!l.length){alert('MATLAB 코드 카드가 없습니다');return}
+  copyText(l.map(c=>c.code.replace(/\s+$/,'')).join('\n\n'),e.target);
+};
+$('copynames').onclick=e=>{
+  const l=[].concat(...mcards().map(sigs));if(!l.length){alert('function 선언 줄이 있는 카드가 없습니다');return}
+  copyText(l.join('\n'),e.target);
+};
+$('print').onclick=()=>window.print();
+$('exp').onclick=()=>{
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(cards,null,1)],{type:'application/json'}));
+  a.download='idea_cards.json';a.click();
+};
+$('imp').onclick=()=>$('file').click();
+$('file').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  f.text().then(t=>{try{const d=norm(JSON.parse(t));if(d){cards=d;save();render()}else alert('형식이 다른 파일입니다.')}catch(x){alert('JSON을 읽지 못했습니다.')}});
+  e.target.value='';
+};
+const GHK='idea_cards_gh_v3';
+const GH={repo:'seagull615/offline_backups',branch:'main',dir:'fundamental_idea_card/json_files'};
+try{Object.assign(GH,JSON.parse(localStorage.getItem(GHK)||'{}'))}catch(e){}
+$('ghrepo').value=GH.repo;$('ghbranch').value=GH.branch;$('ghdir').value=GH.dir;
+function ghRead(){
+  GH.repo=$('ghrepo').value.trim().replace(/^\/+|\/+$/g,'');
+  GH.branch=$('ghbranch').value.trim()||'main';
+  GH.dir=$('ghdir').value.trim().replace(/^\/+|\/+$/g,'');
+  try{localStorage.setItem(GHK,JSON.stringify(GH))}catch(e){}
+}
+const dateKey=n=>{const m=n.match(/(20\d{2})[-_.]?(\d{2})[-_.]?(\d{2})/);return m?m[1]+m[2]+m[3]:''};
+const repoOk=()=>/^[^\/]+\/[^\/]+$/.test(GH.repo);
+async function ghList(){
+  ghRead();
+  if(!repoOk())throw new Error('저장소를 "사용자/저장소" 형식으로 입력하세요');
+  const path=GH.dir?'/'+GH.dir.split('/').map(encodeURIComponent).join('/'):'';
+  const r=await fetch('https://api.github.com/repos/'+GH.repo+'/contents'+path+'?ref='+encodeURIComponent(GH.branch));
+  if(!r.ok)throw new Error('목록 조회 실패 ('+r.status+') - 저장소/브랜치/폴더/공개 여부 확인');
+  const arr=await r.json();
+  const list=(Array.isArray(arr)?arr:[]).filter(x=>x.type==='file'&&/\.json$/i.test(x.name))
+    .sort((a,b)=>dateKey(b.name).localeCompare(dateKey(a.name))||b.name.localeCompare(a.name));
+  const sel=$('ghsel');sel.innerHTML='';
+  if(!list.length){sel.innerHTML='<option value="">(JSON 파일 없음)</option>';throw new Error('폴더에 JSON 파일이 없습니다')}
+  list.forEach((x,i)=>{const o=document.createElement('option');o.value=x.download_url;o.textContent=x.name+(i===0?'  (최신)':'');sel.append(o)});
+  return list;
+}
+async function ghApply(url,silent){
+  const r=await fetch(url+(url.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'});
+  if(!r.ok)throw new Error('파일 읽기 실패 ('+r.status+')');
+  const d=norm(await r.json());
+  if(!d)throw new Error('형식이 다른 파일입니다');
+  if(JSON.stringify(d)===JSON.stringify(cards)){if(!silent)alert('이미 같은 내용입니다.');return}
+  const onlyBlank=cards.length===1&&JSON.stringify(cards[0])===JSON.stringify(blank('idea'));
+  if(!onlyBlank&&!confirm('GitHub 버전('+d.length+'개)으로 현재 내용을 덮어쓸까요?'))return;
+  cards=d;save();render();
+  document.querySelectorAll('.entry').forEach((el,i)=>{const p=el.querySelector('.prev');if(p)renderPrev(p,cards[i].tex)});
+}
+async function ghLatest(silent){
+  try{const list=await ghList();$('ghsel').selectedIndex=0;await ghApply(list[0].download_url,silent)}
+  catch(e){if(!silent)alert(e.message)}
+}
+$('ghlist').onclick=()=>ghList().catch(e=>alert(e.message));
+$('ghlatest').onclick=()=>ghLatest(false);
+$('ghload').onclick=()=>{const u=$('ghsel').value;if(!u){alert('먼저 "목록 보기"로 파일을 고르세요.');return}ghApply(u,false).catch(e=>alert(e.message))};
+['ghrepo','ghbranch','ghdir'].forEach(id=>$(id).addEventListener('change',ghRead));
+render();
+if(repoOk())ghLatest(true);
+window.addEventListener('load',()=>{document.querySelectorAll('.entry').forEach((el,i)=>{const p=el.querySelector('.prev');if(p)renderPrev(p,cards[i].tex)})});
+</script>
+</body>
+</html>
